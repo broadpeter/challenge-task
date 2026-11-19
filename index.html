@@ -5,7 +5,7 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<meta name="theme-color" content="#f6f6f4">
 		<link rel="manifest" href="./manifest.json">
-		<title>Activity Done</title>
+		<title>Challenge Task</title>
 		<link rel="preconnect" href="https://fonts.googleapis.com">
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 		<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
@@ -17,7 +17,8 @@
 				background: #f6f6f4;
 				color: #1c1c1a;
 				--muted: #8f8f8a;
-				--coral: #ff776b;
+				--accent: #78b7d0;
+				--success: #77c9a5;
 			}
 
 			* { box-sizing: border-box; }
@@ -28,7 +29,6 @@
 				padding: 32px 20px 48px;
 				-webkit-font-smoothing: antialiased;
 			}
-			body.activity-theme { background: #ffe0da; }
 
 			main {
 				max-width: 440px;
@@ -37,11 +37,14 @@
 
 			[hidden] { display: none !important; }
 			h1 { margin: 0 0 24px; font-size: 21px; font-weight: 500; }
+			h2 { margin: 0 0 16px; font-size: 18px; font-weight: 500; }
+
 			.hero {
 				padding: 20px 18px;
 				border-radius: 8px;
-				background: #ffe0da;
+				background: #e8f4f8;
 			}
+
 			.hero-title {
 				margin: 0 0 20px;
 				font-size: clamp(26px, 8vw, 34px);
@@ -62,50 +65,44 @@
 
 			button:hover { background: #383836; }
 			button:focus-visible { outline: 2px solid #1c1c1a; outline-offset: 3px; }
-			.not-completed-button {
+			button:disabled {
+				cursor: not-allowed;
+				color: var(--muted);
+				background: #e8e8e5;
+			}
+
+			.secondary-button {
 				margin-top: 12px;
 				background: transparent;
 				border: 1px solid #1c1c1a;
 				color: #1c1c1a;
 			}
-			.not-completed-button:hover { background: rgba(28, 28, 26, 0.08); }
-			.timer-label { margin: 0 0 4px; color: #5b5b56; font-size: 14px; }
-			.timer {
-				margin: 0 0 24px;
-				font-size: 56px;
-				font-weight: 600;
-				font-variant-numeric: tabular-nums;
-				line-height: 1.15;
-			}
-			.undo-button {
-				display: block;
+
+			.secondary-button:hover { background: rgba(28, 28, 26, 0.08); }
+
+			.small-button {
+				display: inline-block;
 				width: auto;
 				min-height: 0;
-				margin: 12px 0 0 auto;
 				padding: 0;
 				background: none;
 				color: #1c1c1a;
 				font-size: 14px;
 			}
-			.undo-button:hover:not(:disabled) { background: none; text-decoration: underline; }
-			button:disabled { cursor: not-allowed; color: var(--muted); }
+
+			.small-button:hover:not(:disabled) { background: none; text-decoration: underline; }
+
 			.completion-message:empty { display: none; }
 			.completion-message {
 				margin: 0 0 16px;
 				padding: 20px 18px;
 				border-radius: 8px;
-				background: #ffe0da;
-				font-size: clamp(26px, 8vw, 34px);
+				background: #e8f9f3;
+				color: var(--success);
 				font-weight: 600;
-				line-height: 1.15;
+				line-height: 1.4;
 			}
 
-			.progress { margin-top: 40px; }
-			.progress h2 { margin: 0 0 8px; font-size: 18px; font-weight: 500; }
-			.count { margin: 0 0 18px; font-size: 14px; color: #1c1c1a; }
-			#clear-button { color: var(--muted); }
-			.clear-confirmation { margin-top: 18px; }
-			.clear-confirmation p { font-size: 14px; line-height: 1.5; }
 			.account {
 				margin: 0 0 24px 0;
 				padding: 12px 14px;
@@ -113,7 +110,9 @@
 				border-radius: 8px;
 				background: #fff;
 			}
+
 			.sync-row { display: flex; align-items: center; gap: 8px; }
+
 			.account label {
 				position: absolute;
 				width: 1px;
@@ -125,6 +124,7 @@
 				white-space: nowrap;
 				border: 0;
 			}
+
 			.account input {
 				flex: 1;
 				width: 0;
@@ -137,6 +137,7 @@
 				color: var(--muted);
 				font: 13px 'Inter', sans-serif;
 			}
+
 			.account .sync-button {
 				width: auto;
 				min-height: 0;
@@ -148,88 +149,258 @@
 				font: 13px 'Inter', sans-serif;
 				white-space: nowrap;
 			}
+
 			.account .sync-button:hover:not(:disabled) { background: none; color: #1c1c1a; }
+
 			.account p { margin: 0; font-size: 14px; overflow-wrap: anywhere; }
-			#account-email { flex: 1; }
+
 			#account-status:empty { display: none; }
 			#account-status { margin-top: 7px; color: var(--muted); font-size: 12px; line-height: 1.4; }
-			.ticks {
-				display: grid;
-				grid-template-columns: repeat(7, minmax(0, 1fr));
-				row-gap: 8px;
+
+			.task-section {
+				margin: 24px 0;
+				padding: 20px 18px;
+				border-radius: 8px;
+				background: #fff;
+				border: 1px solid #e8e8e5;
 			}
 
-			.tick {
-				display: grid;
-				place-items: center;
-				width: 70%;
-				aspect-ratio: 1;
-				margin: auto;
-				background: var(--coral);
+			.task-header {
+				display: flex;
+				justify-content: space-between;
+				align-items: start;
+				margin-bottom: 16px;
+			}
+
+			.reset-countdown {
+				font-size: 12px;
+				color: var(--muted);
+				white-space: nowrap;
+				margin-left: 8px;
+			}
+
+			.task-input-group {
+				display: flex;
+				gap: 8px;
+				margin-bottom: 16px;
+			}
+
+			.task-input-group input {
+				flex: 1;
+				min-height: 44px;
+				padding: 10px 12px;
+				border: 1px solid #e8e8e5;
+				border-radius: 6px;
+				font: 14px 'Inter', sans-serif;
 				color: #1c1c1a;
+			}
+
+			.task-input-group button {
+				width: auto;
+				min-width: 100px;
+				padding: 0 16px;
+			}
+
+			.task-display {
+				margin-bottom: 16px;
+			}
+
+			.task-text {
+				margin: 0 0 12px;
+				font-size: 18px;
+				font-weight: 500;
+				line-height: 1.4;
+				word-wrap: break-word;
+			}
+
+			.task-status {
+				display: flex;
+				align-items: center;
+				gap: 8px;
+				margin-bottom: 12px;
+				padding: 10px 12px;
+				border-radius: 6px;
+				background: #f6f6f4;
+			}
+
+			.status-icon {
 				font-size: 20px;
-				font-weight: 600;
+				flex-shrink: 0;
 			}
-			.tick--circle { border-radius: 50%; }
-			.tick--triangle {
-				width: 78%;
-				clip-path: polygon(50% 6.7%, 0 93.3%, 100% 93.3%);
+
+			.status-text {
+				font-size: 14px;
+				color: var(--muted);
 			}
-			.tick--diamond {
-				width: 78%;
-				clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%);
+
+			.status-text.completed {
+				color: var(--success);
+				font-weight: 500;
+			}
+
+			.check-in-list {
+				margin-bottom: 16px;
+				padding-top: 12px;
+				border-top: 1px solid #e8e8e5;
+			}
+
+			.check-in-item {
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+				margin-bottom: 8px;
+				padding: 8px 0;
+				font-size: 13px;
+				border-bottom: 1px solid #f0f0ed;
+			}
+
+			.check-in-item:last-child {
+				border-bottom: none;
+			}
+
+			.check-in-time {
+				color: var(--muted);
+			}
+
+			.check-in-actions button {
+				width: auto;
+				min-height: 0;
+				padding: 2px 6px;
+				font-size: 12px;
+				background: #f0f0ed;
+				color: #1c1c1a;
+				border-radius: 3px;
+			}
+
+			.check-in-actions button:hover { background: #e8e8e5; }
+
+			.button-group {
+				display: grid;
+				grid-template-columns: 1fr 1fr;
+				gap: 8px;
+				margin-top: 16px;
+			}
+
+			.button-group button { margin: 0; }
+			.button-group .secondary-button { margin-top: 0; }
+
+			.empty-state {
+				text-align: center;
+				padding: 20px;
+				color: var(--muted);
+			}
+
+			.empty-state p {
+				margin: 0;
+				font-size: 14px;
+				line-height: 1.5;
+			}
+
+			.history-section {
+				margin-top: 32px;
+			}
+
+			.history-section h2 {
+				margin-bottom: 16px;
+				font-size: 18px;
+				font-weight: 500;
+			}
+
+			.week-item {
+				margin-bottom: 16px;
+				padding: 12px 14px;
+				border: 1px solid #e8e8e5;
+				border-radius: 6px;
+				background: #fff;
+				font-size: 14px;
+			}
+
+			.week-date {
+				color: var(--muted);
+				font-size: 12px;
+				margin-bottom: 4px;
+			}
+
+			.week-task {
+				margin-bottom: 8px;
+				word-wrap: break-word;
+			}
+
+			.week-status {
+				color: var(--success);
+				font-weight: 500;
+			}
+
+			.week-status.incomplete {
+				color: var(--muted);
 			}
 		</style>
 	</head>
 	<body>
 		<main>
-			<section id="home-view">
-
-				<section class="account" aria-label="Account">
-					<form id="sign-in-form" class="sync-row">
-						<label for="email">Email</label>
-						<input id="email" type="email" autocomplete="email" required placeholder="you@example.com">
-						<button class="sync-button" id="sign-in-button" type="submit">Sign in</button>
-					</form>
-					<div class="sync-row" id="signed-in-account" hidden>
-						<p id="account-email"></p>
-						<button class="sync-button" id="sign-out-button" type="button">Sign out</button>
-					</div>
-					<p id="account-status" role="status" aria-live="polite"></p>
-				</section>
-				<p class="completion-message" id="completion-message" role="status" aria-live="polite"></p>
-				<div class="hero">
-	<p class="hero-title">Start something you've been avoiding.</p>
-	<button id="start-button" type="button">Start</button>
-</div>
-				<section class="progress" aria-label="Completed activities">
-				<p class="count" id="count" aria-live="polite">0 done</p>
-					<div class="ticks" id="ticks" aria-hidden="true"></div>
-					<button class="undo-button" id="undo-button" type="button" hidden>Undo activity</button>
-					<button class="undo-button" id="clear-button" type="button" hidden>Clear all history</button>
-					<div class="clear-confirmation" id="clear-confirmation" role="group" aria-label="Confirm clear history" hidden>
-						<p>Delete all completed activities for this account? This cannot be undone.</p>
-						<button id="confirm-clear-button" type="button">Yes, delete all</button>
-						<button class="undo-button" id="cancel-clear-button" type="button">Cancel</button>
-					</div>
-					<button class="undo-button" id="retry-button" type="button" hidden>Retry history</button>
-				</section>
+			<section class="account" aria-label="Account">
+				<form id="sign-in-form" class="sync-row">
+					<label for="email">Email</label>
+					<input id="email" type="email" autocomplete="email" required placeholder="you@example.com">
+					<button class="sync-button" id="sign-in-button" type="submit">Sign in</button>
+				</form>
+				<div class="sync-row" id="signed-in-account" hidden>
+					<p id="account-email"></p>
+					<button class="sync-button" id="sign-out-button" type="button">Sign out</button>
+				</div>
+				<p id="account-status" role="status" aria-live="polite"></p>
 			</section>
-			<section id="prepare-view" hidden>
-	<h1>Pick the next step</h1>
-	<p class="timer-label">You have 5 minutes to open the task and begin</p>
-	<p class="timer" id="prepare-timer" role="timer">5:00</p>
-	<button id="begin-activity-button" type="button">Do it</button>
-	<button class="not-completed-button" id="prepare-not-completed-button" type="button">Not this time</button>
-</section>
-		<section id="activity-view" hidden>
-	<h1>Keep going</h1>
-		<p class="timer-label">Do what you can in five minutes. You can stop when the timer runs out</p>
-	<p class="timer" id="timer" role="timer">5:00</p>
-	<button id="done-button" type="button">Done</button>
-	<p id="activity-status" role="alert"></p>
-	<button class="not-completed-button" id="not-completed-button" type="button">Not completed</button>
-</section>
+
+			<p class="completion-message" id="completion-message" role="status" aria-live="polite"></p>
+
+			<section class="hero" id="hero-section">
+				<p class="hero-title">Set your challenge for this week</p>
+				<p style="margin: 0 0 20px; color: var(--muted); font-size: 14px;">One task to complete before Sunday</p>
+			</section>
+
+			<section class="task-section">
+				<div class="task-header">
+					<h2>This week's challenge</h2>
+					<div class="reset-countdown" id="reset-countdown"></div>
+				</div>
+
+				<div class="task-display" id="task-display" hidden>
+					<p class="task-text" id="task-text"></p>
+					<div class="task-status" id="task-status"></div>
+					<div class="check-in-list" id="check-in-list"></div>
+					<div class="button-group">
+						<button id="complete-button" type="button">Mark complete</button>
+						<button class="secondary-button" id="check-in-button" type="button">Check in</button>
+					</div>
+					<button class="small-button" id="undo-check-in-button" type="button" hidden>Undo last check-in</button>
+				</div>
+
+				<div id="task-input-display">
+					<div class="task-input-group">
+						<input 
+							id="task-input" 
+							type="text" 
+							placeholder="What's your challenge this week?" 
+							maxlength="200"
+							aria-label="Weekly challenge"
+						>
+						<button id="set-task-button" type="button">Set</button>
+					</div>
+					<p id="char-count" style="font-size: 12px; color: var(--muted); margin: 0;"></p>
+				</div>
+
+				<div class="empty-state" id="empty-state" hidden>
+					<p>No challenge set yet. Add one above to get started.</p>
+				</div>
+			</section>
+
+			<section class="history-section">
+				<h2>Challenge history</h2>
+				<div id="history-list"></div>
+				<div class="empty-state" id="history-empty" hidden>
+					<p>No previous challenges. Set your first one above.</p>
+				</div>
+			</section>
 		</main>
 		<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 		<script>
@@ -246,38 +417,56 @@
 				});
 			}
 
-			const homeView = document.getElementById('home-view');
-			const prepareView = document.getElementById('prepare-view');
-			const activityView = document.getElementById('activity-view');
-			const button = document.getElementById('done-button');
-			const activityStatus = document.getElementById('activity-status');
-			const completionMessage = document.getElementById('completion-message');
-			const undoButton = document.getElementById('undo-button');
-			const clearButton = document.getElementById('clear-button');
-			const clearConfirmation = document.getElementById('clear-confirmation');
-			const confirmClearButton = document.getElementById('confirm-clear-button');
-			const cancelClearButton = document.getElementById('cancel-clear-button');
-			const count = document.getElementById('count');
-			const ticks = document.getElementById('ticks');
-			const startButton = document.getElementById('start-button');
+			// DOM Elements
 			const signInForm = document.getElementById('sign-in-form');
 			const signInButton = document.getElementById('sign-in-button');
 			const signOutButton = document.getElementById('sign-out-button');
 			const accountEmail = document.getElementById('account-email');
 			const accountStatus = document.getElementById('account-status');
-			const retryButton = document.getElementById('retry-button');
-			let timer = document.getElementById('prepare-timer');
+			const completionMessage = document.getElementById('completion-message');
+			const taskInput = document.getElementById('task-input');
+			const setTaskButton = document.getElementById('set-task-button');
+			const taskDisplay = document.getElementById('task-display');
+			const taskInputDisplay = document.getElementById('task-input-display');
+			const taskText = document.getElementById('task-text');
+			const taskStatus = document.getElementById('task-status');
+			const checkInList = document.getElementById('check-in-list');
+			const completeButton = document.getElementById('complete-button');
+			const checkInButton = document.getElementById('check-in-button');
+			const undoCheckInButton = document.getElementById('undo-check-in-button');
+			const resetCountdown = document.getElementById('reset-countdown');
+			const historyList = document.getElementById('history-list');
+			const historyEmpty = document.getElementById('history-empty');
+			const charCount = document.getElementById('char-count');
+
+			// State
 			let user = null;
-			let activities = [];
-			let undoActivityId = null;
+			let currentWeekTask = null;
+			let pastTasks = [];
+			let checkIns = [];
 			let loading = true;
-			let loadFailed = false;
 			let saving = false;
-			let sessionVersion = 0;
-			let initialized = false;
-			let timerInterval = null;
-			let timerEndsAt = 0;
 			let completionMessageTimeout = null;
+			let countdownInterval = null;
+
+			// Get the Sunday of the current week (week starts Sunday)
+			function getSundayOfWeek(date = new Date()) {
+				const d = new Date(date);
+				const day = d.getDay();
+				const diff = d.getDate() - day;
+				return new Date(d.setDate(diff));
+			}
+
+			// Format date for database
+			function formatDateForDb(date) {
+				return date.toISOString().split('T')[0];
+			}
+
+			// Update character count
+			taskInput.addEventListener('input', () => {
+				const remaining = 200 - taskInput.value.length;
+				charCount.textContent = remaining >= 0 ? `${remaining} characters remaining` : 'Character limit exceeded';
+			});
 
 			function setCompletionMessage(message = '') {
 				clearTimeout(completionMessageTimeout);
@@ -288,88 +477,230 @@
 				}, 5000) : null;
 			}
 
-			function renderHistory() {
-				ticks.replaceChildren();
-				for (const activity of activities) {
-					const tick = document.createElement('span');
-					tick.className = `tick tick--${activity.shape}`;
-					tick.style.backgroundColor = activity.color;
-					tick.textContent = '\u2713';
-					ticks.append(tick);
+			function updateResetCountdown() {
+				if (!currentWeekTask) return;
+				
+				const nextSunday = new Date(getSundayOfWeek());
+				nextSunday.setDate(nextSunday.getDate() + 7);
+				const now = new Date();
+				const diff = nextSunday - now;
+				
+				if (diff <= 0) {
+					resetCountdown.textContent = 'Resets now';
+				} else {
+					const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+					const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+					resetCountdown.textContent = days > 0 ? `${days}d ${hours}h left` : `${hours}h left`;
 				}
-				count.textContent = `${activities.length} done`;
-				if (!user || !activities.length || loading) clearConfirmation.hidden = true;
-				undoButton.hidden = !undoActivityId || !user;
-				undoButton.disabled = loading || saving;
-				clearButton.hidden = activities.length === 0 || !user || !clearConfirmation.hidden;
-				clearButton.disabled = loading || saving;
-				confirmClearButton.disabled = loading || saving;
-				cancelClearButton.disabled = saving;
-				startButton.disabled = !user || loading || saving;
-				button.disabled = !user || loading || saving;
-				signOutButton.disabled = saving;
-				retryButton.hidden = !user || !loadFailed;
 			}
 
-			async function loadHistory() {
-				const version = sessionVersion;
-				const accountId = user.id;
-				loading = true;
-				loadFailed = false;
-				accountStatus.textContent = 'Loading history...';
+			function renderCheckIns() {
+				checkInList.replaceChildren();
+				undoCheckInButton.hidden = checkIns.length === 0 || !user || loading || saving;
+				
+				if (checkIns.length === 0) {
+					checkInList.style.display = 'none';
+					return;
+				}
+				
+				checkInList.style.display = 'block';
+				const list = document.createElement('div');
+				for (const checkIn of checkIns) {
+					const item = document.createElement('div');
+					item.className = 'check-in-item';
+					
+					const time = new Date(checkIn.checked_in_at).toLocaleTimeString('en-US', {
+						hour: 'numeric',
+						minute: '2-digit',
+						hour12: true
+					});
+					
+					const timeEl = document.createElement('div');
+					timeEl.className = 'check-in-time';
+					timeEl.textContent = time;
+					
+					const removeBtn = document.createElement('button');
+					removeBtn.className = 'check-in-actions';
+					removeBtn.textContent = 'Remove';
+					removeBtn.onclick = async () => {
+						if (!user || saving || !checkIn.id) return;
+						saving = true;
+						try {
+							const { error } = await db.from('task_check_ins').delete()
+								.eq('id', checkIn.id).eq('user_id', user.id);
+							if (error) throw error;
+							checkIns = checkIns.filter(c => c.id !== checkIn.id);
+							renderCheckIns();
+						} catch (error) {
+							accountStatus.textContent = `Error removing check-in: ${error.message}`;
+						} finally {
+							saving = false;
+						}
+					};
+					
+					item.append(timeEl, removeBtn);
+					list.append(item);
+				}
+				checkInList.replaceChildren(list);
+			}
+
+			function renderTask() {
+				if (!currentWeekTask) {
+					taskDisplay.hidden = true;
+					taskInputDisplay.hidden = false;
+					return;
+				}
+
+				taskInputDisplay.hidden = true;
+				taskDisplay.hidden = false;
+				taskText.textContent = currentWeekTask.task_description;
+
+				// Update status
+				taskStatus.replaceChildren();
+				const icon = document.createElement('div');
+				icon.className = 'status-icon';
+				const statusText = document.createElement('div');
+				statusText.className = 'status-text';
+
+				if (currentWeekTask.completed_at) {
+					icon.textContent = '✓';
+					statusText.textContent = 'Completed on ' + new Date(currentWeekTask.completed_at).toLocaleDateString();
+					statusText.classList.add('completed');
+					completeButton.disabled = true;
+					completeButton.textContent = 'Already completed';
+					checkInButton.hidden = true;
+				} else {
+					icon.textContent = '◯';
+					statusText.textContent = 'In progress';
+					completeButton.disabled = false;
+					completeButton.textContent = 'Mark complete';
+					checkInButton.hidden = false;
+				}
+
+				taskStatus.append(icon, statusText);
+				renderCheckIns();
+			}
+
+			function renderHistory() {
+				historyList.replaceChildren();
+				if (pastTasks.length === 0) {
+					historyEmpty.hidden = false;
+					return;
+				}
+
+				historyEmpty.hidden = true;
+				for (const task of pastTasks) {
+					const item = document.createElement('div');
+					item.className = 'week-item';
+					
+					const date = document.createElement('div');
+					date.className = 'week-date';
+					date.textContent = 'Week of ' + new Date(task.week_start).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+					
+					const taskEl = document.createElement('div');
+					taskEl.className = 'week-task';
+					taskEl.textContent = task.task_description;
+					
+					const status = document.createElement('div');
+					status.className = 'week-status' + (task.completed_at ? '' : ' incomplete');
+					status.textContent = task.completed_at ? '✓ Completed' : '◯ Not completed';
+					
+					item.append(date, taskEl, status);
+					historyList.append(item);
+				}
+			}
+
+			function renderUI() {
+				setTaskButton.disabled = !user || loading || saving;
+				completeButton.disabled = !user || loading || saving || !currentWeekTask || currentWeekTask.completed_at;
+				checkInButton.disabled = !user || loading || saving || !currentWeekTask || currentWeekTask.completed_at;
+				signOutButton.disabled = saving;
+				renderTask();
 				renderHistory();
-				const rows = [];
+				updateResetCountdown();
+			}
+
+			async function loadWeekData() {
+				if (!user) return;
+
+				loading = true;
+				accountStatus.textContent = 'Loading challenge...';
+				renderUI();
+
 				try {
-					while (true) {
-						const { data, error } = await db.from('completions')
-							.select('id, user_id, completed_at, shape, color')
-							.eq('user_id', accountId)
-							.order('completed_at', { ascending: true })
-							.order('id', { ascending: true })
-							.range(rows.length, rows.length + 999);
-						if (error) throw error;
-						rows.push(...data);
-						if (data.length < 1000) break;
+					const sundayStr = formatDateForDb(getSundayOfWeek());
+
+					// Load current week task
+					const { data: taskData, error: taskError } = await db.from('weekly_tasks')
+						.select('*')
+						.eq('user_id', user.id)
+						.eq('week_start', sundayStr)
+						.single();
+
+					if (taskError && taskError.code !== 'PGRST116') throw taskError;
+					currentWeekTask = taskData || null;
+
+					// Load check-ins if task exists
+					if (currentWeekTask) {
+						const { data: checkInData, error: checkInError } = await db.from('task_check_ins')
+							.select('*')
+							.eq('task_id', currentWeekTask.id)
+							.order('checked_in_at', { ascending: false });
+
+						if (checkInError) throw checkInError;
+						checkIns = checkInData || [];
+					} else {
+						checkIns = [];
 					}
-					if (version !== sessionVersion) return;
-					activities = rows;
-					loading = false;
+
+					// Load past tasks
+					const { data: pastData, error: pastError } = await db.from('weekly_tasks')
+						.select('*')
+						.eq('user_id', user.id)
+						.lt('week_start', sundayStr)
+						.order('week_start', { ascending: false })
+						.limit(12);
+
+					if (pastError) throw pastError;
+					pastTasks = pastData || [];
+
 					accountStatus.textContent = '';
 				} catch (error) {
-					if (version !== sessionVersion) return;
-					loadFailed = true;
-					accountStatus.textContent = `Could not load history: ${error.message}`;
+					accountStatus.textContent = `Could not load challenge: ${error.message}`;
 				} finally {
-					if (version === sessionVersion) renderHistory();
+					loading = false;
+					renderUI();
 				}
 			}
 
 			if (db) {
 				db.auth.onAuthStateChange((_event, session) => {
 					const nextUser = session?.user || null;
-					if (initialized && nextUser?.id === user?.id) return;
-					initialized = true;
-					sessionVersion += 1;
-					setCompletionMessage();
+					if (nextUser?.id === user?.id) return;
+					
 					user = nextUser;
-					activities = [];
-					undoActivityId = null;
+					currentWeekTask = null;
+					pastTasks = [];
+					checkIns = [];
 					loading = !!user;
-					loadFailed = false;
+
 					signInForm.hidden = !!user;
-					accountEmail.textContent = user?.email || '';
 					document.getElementById('signed-in-account').hidden = !user;
-					accountStatus.textContent = user ? '' : 'Sign in to save your activities.';
-					renderHistory();
-					if (user) setTimeout(loadHistory, 0);
+					accountEmail.textContent = user?.email || '';
+					accountStatus.textContent = user ? '' : 'Sign in to save your challenges.';
+					
+					renderUI();
+					if (user) setTimeout(loadWeekData, 0);
 				});
 			} else {
 				loading = false;
 				signInButton.disabled = true;
 				accountStatus.textContent = configured ? 'Could not load Supabase. Check your connection.' : 'Set your Supabase URL and publishable key to enable sign-in.';
 			}
-			renderHistory();
 
+			renderUI();
+
+			// Sign in
 			signInForm.addEventListener('submit', async event => {
 				event.preventDefault();
 				if (!db) return;
@@ -383,148 +714,151 @@
 				signInButton.disabled = false;
 			});
 
+			// Sign out
 			signOutButton.addEventListener('click', async () => {
 				signOutButton.disabled = true;
 				const { error } = await db.auth.signOut();
 				if (error) accountStatus.textContent = `Could not sign out: ${error.message}`;
 				signOutButton.disabled = false;
 			});
-			retryButton.addEventListener('click', loadHistory);
 
-			function updateTimer() {
-				const seconds = Math.max(0, Math.ceil((timerEndsAt - Date.now()) / 1000));
-				timer.textContent = `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, '0')}`;
-				if (seconds === 0) {
-					clearInterval(timerInterval);
-					timerInterval = null;
-				}
-			}
+			// Set task
+			setTaskButton.addEventListener('click', async () => {
+				const taskDesc = taskInput.value.trim();
+				if (!taskDesc || !user || loading || saving) return;
 
-			function startTimer(display) {
-				clearInterval(timerInterval);
-				timer = display;
-				document.body.classList.add('activity-theme');
-				timerEndsAt = Date.now() + 5 * 60 * 1000;
-				updateTimer();
-				timerInterval = setInterval(updateTimer, 250);
-			}
-
-			startButton.addEventListener('click', () => {
-				setCompletionMessage();
-				homeView.hidden = true;
-				prepareView.hidden = false;
-				startTimer(document.getElementById('prepare-timer'));
-			});
-
-			document.getElementById('begin-activity-button').addEventListener('click', () => {
-				prepareView.hidden = true;
-				activityView.hidden = false;
-				startTimer(document.getElementById('timer'));
-			});
-
-			function showHome() {
-				clearInterval(timerInterval);
-				timerInterval = null;
-				prepareView.hidden = true;
-				activityView.hidden = true;
-				homeView.hidden = false;
-				document.body.classList.remove('activity-theme');
-			}
-
-			document.getElementById('not-completed-button').addEventListener('click', showHome);
-			document.getElementById('prepare-not-completed-button').addEventListener('click', showHome);
-
-			button.addEventListener('click', async () => {
-				if (!user || loading || saving) return;
-				activityStatus.textContent = '';
 				saving = true;
-				renderHistory();
-				const shapes = ['circle', 'square', 'triangle', 'diamond'];
-				const colors = ['#ff776b', '#f2c14e', '#77c9a5', '#78b7d0', '#4f8edc', '#c79ad8', '#f19ca8'];
-				const shape = shapes[Math.floor(Math.random() * shapes.length)];
-				const accountId = user.id;
-				const version = sessionVersion;
+				renderUI();
+				accountStatus.textContent = 'Setting challenge...';
+
 				try {
-					const { data, error } = await db.from('completions')
-						.insert({ user_id: accountId, shape, color: colors[Math.floor(Math.random() * colors.length)] })
-						.select('id, user_id, completed_at, shape, color').single();
-					if (error) throw error;
-					if (version === sessionVersion) {
-						activities.push(data);
-						activities.sort((first, second) => first.completed_at.localeCompare(second.completed_at) || first.id.localeCompare(second.id));
-						undoActivityId = data.id;
-						accountStatus.textContent = '';
-						showHome();
-						setCompletionMessage('You did something you were avoiding.');
+					const sundayStr = formatDateForDb(getSundayOfWeek());
+					
+					if (currentWeekTask) {
+						// Update existing task
+						const { error } = await db.from('weekly_tasks')
+							.update({ task_description: taskDesc })
+							.eq('id', currentWeekTask.id)
+							.eq('user_id', user.id);
+						
+						if (error) throw error;
+						currentWeekTask.task_description = taskDesc;
+					} else {
+						// Create new task
+						const { data, error } = await db.from('weekly_tasks')
+							.insert({
+								user_id: user.id,
+								week_start: sundayStr,
+								task_description: taskDesc,
+								completed_at: null
+							})
+							.select()
+							.single();
+						
+						if (error) throw error;
+						currentWeekTask = data;
+						checkIns = [];
 					}
+
+					taskInput.value = '';
+					charCount.textContent = '';
+					accountStatus.textContent = '';
+					setCompletionMessage('Challenge set for this week!');
+					renderUI();
 				} catch (error) {
-					if (version === sessionVersion) activityStatus.textContent = `Could not save activity: ${error.message}`;
-				} finally {
+					accountStatus.textContent = `Could not set challenge: ${error.message}`;
 					saving = false;
-					renderHistory();
+					renderUI();
 				}
 			});
 
-			undoButton.addEventListener('click', async () => {
-				if (!user || loading || saving || !undoActivityId) return;
+			// Mark complete
+			completeButton.addEventListener('click', async () => {
+				if (!user || loading || saving || !currentWeekTask) return;
+
 				saving = true;
-				renderHistory();
-				const activityId = undoActivityId;
-				const version = sessionVersion;
-				const accountId = user.id;
+				renderUI();
+				accountStatus.textContent = 'Marking complete...';
+
 				try {
-					const { data, error } = await db.from('completions').delete()
-						.eq('id', activityId).eq('user_id', accountId).select('id');
+					const { error } = await db.from('weekly_tasks')
+						.update({ completed_at: new Date().toISOString() })
+						.eq('id', currentWeekTask.id)
+						.eq('user_id', user.id);
+
 					if (error) throw error;
-					if (data.length !== 1) throw new Error('Activity was not found. Retry history.');
-					if (version === sessionVersion) {
-						activities = activities.filter(activity => activity.id !== activityId);
-						undoActivityId = null;
-						accountStatus.textContent = '';
-						setCompletionMessage();
-					}
+					currentWeekTask.completed_at = new Date().toISOString();
+					accountStatus.textContent = '';
+					setCompletionMessage('Challenge completed! Great work!');
+					renderUI();
 				} catch (error) {
-					if (version === sessionVersion) accountStatus.textContent = `Could not undo activity: ${error.message}`;
-				} finally {
+					accountStatus.textContent = `Could not mark complete: ${error.message}`;
 					saving = false;
-					renderHistory();
+					renderUI();
 				}
 			});
 
-			clearButton.addEventListener('click', () => {
-				if (!user || loading || saving || !activities.length) return;
-				clearConfirmation.hidden = false;
-				renderHistory();
-				confirmClearButton.focus();
-			});
+			// Check in
+			checkInButton.addEventListener('click', async () => {
+				if (!user || loading || saving || !currentWeekTask) return;
 
-			cancelClearButton.addEventListener('click', () => {
-				clearConfirmation.hidden = true;
-				renderHistory();
-				clearButton.focus();
-			});
-
-			confirmClearButton.addEventListener('click', async () => {
-				if (!user || loading || saving || !activities.length || clearConfirmation.hidden) return;
-				const accountId = user.id;
-				const version = sessionVersion;
 				saving = true;
-				renderHistory();
+				renderUI();
+				accountStatus.textContent = 'Recording check-in...';
+
 				try {
-					const { error } = await db.from('completions').delete().eq('user_id', accountId);
+					const { data, error } = await db.from('task_check_ins')
+						.insert({
+							task_id: currentWeekTask.id,
+							user_id: user.id,
+							checked_in_at: new Date().toISOString()
+						})
+						.select()
+						.single();
+
 					if (error) throw error;
-					if (version === sessionVersion) {
-						activities = [];
-						undoActivityId = null;
-						accountStatus.textContent = '';
-						setCompletionMessage();
-					}
+					checkIns.unshift(data);
+					accountStatus.textContent = '';
+					setCompletionMessage('Check-in recorded!');
+					renderUI();
 				} catch (error) {
-					if (version === sessionVersion) accountStatus.textContent = `Could not clear history: ${error.message}`;
-				} finally {
+					accountStatus.textContent = `Could not save check-in: ${error.message}`;
 					saving = false;
-					renderHistory();
+					renderUI();
 				}
+			});
+
+			// Undo last check-in
+			undoCheckInButton.addEventListener('click', async () => {
+				if (!user || loading || saving || checkIns.length === 0) return;
+
+				saving = true;
+				renderUI();
+				accountStatus.textContent = 'Removing check-in...';
+
+				const lastCheckIn = checkIns[0];
+				try {
+					const { error } = await db.from('task_check_ins').delete()
+						.eq('id', lastCheckIn.id).eq('user_id', user.id);
+
+					if (error) throw error;
+					checkIns.shift();
+					accountStatus.textContent = '';
+					setCompletionMessage('Check-in removed');
+					renderUI();
+				} catch (error) {
+					accountStatus.textContent = `Could not remove check-in: ${error.message}`;
+					saving = false;
+					renderUI();
+				}
+			});
+
+			// Update countdown every minute
+			countdownInterval = setInterval(updateResetCountdown, 60000);
+
+			// Clean up on page unload
+			window.addEventListener('beforeunload', () => {
+				clearInterval(countdownInterval);
 			});
 		</script>
 	</body>
