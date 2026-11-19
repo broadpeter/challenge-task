@@ -428,11 +428,8 @@
 			const taskInputDisplay = document.getElementById('task-input-display');
 			const taskText = document.getElementById('task-text');
 			const taskStatus = document.getElementById('task-status');
-			const checkInList = document.getElementById('check-in-list');
 			const completeButton = document.getElementById('complete-button');
-			const checkInButton = document.getElementById('check-in-button');
 			const undoCompleteButton = document.getElementById('undo-complete-button');
-			const undoCheckInButton = document.getElementById('undo-check-in-button');
 			const resetCountdown = document.getElementById('reset-countdown');
 			const historyList = document.getElementById('history-list');
 			const historyEmpty = document.getElementById('history-empty');
@@ -442,7 +439,6 @@
 			let user = null;
 			let currentWeekTask = null;
 			let pastTasks = [];
-			let checkIns = [];
 			let loading = true;
 			let saving = false;
 			let completionMessageTimeout = null;
@@ -494,53 +490,7 @@
 			}
 
 			function renderCheckIns() {
-				checkInList.replaceChildren();
-				undoCheckInButton.hidden = checkIns.length === 0 || !user || loading || saving;
-				
-				if (checkIns.length === 0) {
-					checkInList.style.display = 'none';
-					return;
-				}
-				
-				checkInList.style.display = 'block';
-				const list = document.createElement('div');
-				for (const checkIn of checkIns) {
-					const item = document.createElement('div');
-					item.className = 'check-in-item';
-					
-					const time = new Date(checkIn.checked_in_at).toLocaleTimeString('en-US', {
-						hour: 'numeric',
-						minute: '2-digit',
-						hour12: true
-					});
-					
-					const timeEl = document.createElement('div');
-					timeEl.className = 'check-in-time';
-					timeEl.textContent = time;
-					
-					const removeBtn = document.createElement('button');
-					removeBtn.className = 'check-in-actions';
-					removeBtn.textContent = 'Remove';
-					removeBtn.onclick = async () => {
-						if (!user || saving || !checkIn.id) return;
-						saving = true;
-						try {
-							const { error } = await db.from('task_check_ins').delete()
-								.eq('id', checkIn.id).eq('user_id', user.id);
-							if (error) throw error;
-							checkIns = checkIns.filter(c => c.id !== checkIn.id);
-							renderCheckIns();
-						} catch (error) {
-							accountStatus.textContent = `Error removing check-in: ${error.message}`;
-						} finally {
-							saving = false;
-						}
-					};
-					
-					item.append(timeEl, removeBtn);
-					list.append(item);
-				}
-				checkInList.replaceChildren(list);
+				// Check-ins removed - feature simplified
 			}
 
 			function renderTask() {
@@ -566,19 +516,17 @@
 					statusText.textContent = 'Completed on ' + new Date(currentWeekTask.completed_at).toLocaleDateString();
 					statusText.classList.add('completed');
 					completeButton.disabled = true;
-					completeButton.textContent = 'Already completed';
-					checkInButton.hidden = true;
+					completeButton.textContent = 'Completed';
 					undoCompleteButton.hidden = false;
 				} else {
 					icon.textContent = '◯';
 					statusText.textContent = 'In progress';
 					completeButton.disabled = false;
 					completeButton.textContent = 'Mark complete';
-					checkInButton.hidden = false;
+					undoCompleteButton.hidden = true;
 				}
 
 				taskStatus.append(icon, statusText);
-				renderCheckIns();
 			}
 
 			function renderHistory() {
@@ -613,7 +561,7 @@
 			function renderUI() {
 				setTaskButton.disabled = !user || loading || saving;
 				completeButton.disabled = !user || loading || saving || !currentWeekTask || currentWeekTask.completed_at;
-				checkInButton.disabled = !user || loading || saving || !currentWeekTask || currentWeekTask.completed_at;
+				undoCompleteButton.disabled = !user || loading || saving;
 				signOutButton.disabled = saving;
 				renderTask();
 				renderHistory();
@@ -639,19 +587,6 @@
 
 					if (taskError && taskError.code !== 'PGRST116') throw taskError;
 					currentWeekTask = taskData || null;
-
-					// Load check-ins if task exists
-					if (currentWeekTask) {
-						const { data: checkInData, error: checkInError } = await db.from('task_check_ins')
-							.select('*')
-							.eq('task_id', currentWeekTask.id)
-							.order('checked_in_at', { ascending: false });
-
-						if (checkInError) throw checkInError;
-						checkIns = checkInData || [];
-					} else {
-						checkIns = [];
-					}
 
 					// Load past tasks
 					const { data: pastData, error: pastError } = await db.from('weekly_tasks')
@@ -681,7 +616,6 @@
 					user = nextUser;
 					currentWeekTask = null;
 					pastTasks = [];
-					checkIns = [];
 					loading = !!user;
 
 					signInForm.hidden = !!user;
@@ -798,56 +732,27 @@
 				}
 			});
 
-			// Check in
-			checkInButton.addEventListener('click', async () => {
+			// Undo completion
+			undoCompleteButton.addEventListener('click', async () => {
 				if (!user || loading || saving || !currentWeekTask) return;
 
 				saving = true;
 				renderUI();
-				accountStatus.textContent = 'Recording check-in...';
+				accountStatus.textContent = 'Undoing completion...';
 
 				try {
-					const { data, error } = await db.from('task_check_ins')
-						.insert({
-							task_id: currentWeekTask.id,
-							user_id: user.id,
-							checked_in_at: new Date().toISOString()
-						})
-						.select()
-						.single();
+					const { error } = await db.from('weekly_tasks')
+						.update({ completed_at: null })
+						.eq('id', currentWeekTask.id)
+						.eq('user_id', user.id);
 
 					if (error) throw error;
-					checkIns.unshift(data);
+					currentWeekTask.completed_at = null;
 					accountStatus.textContent = '';
-					setCompletionMessage('Check-in recorded!');
+					setCompletionMessage('Completion undone');
 					renderUI();
 				} catch (error) {
-					accountStatus.textContent = `Could not save check-in: ${error.message}`;
-					saving = false;
-					renderUI();
-				}
-			});
-
-			// Undo last check-in
-			undoCheckInButton.addEventListener('click', async () => {
-				if (!user || loading || saving || checkIns.length === 0) return;
-
-				saving = true;
-				renderUI();
-				accountStatus.textContent = 'Removing check-in...';
-
-				const lastCheckIn = checkIns[0];
-				try {
-					const { error } = await db.from('task_check_ins').delete()
-						.eq('id', lastCheckIn.id).eq('user_id', user.id);
-
-					if (error) throw error;
-					checkIns.shift();
-					accountStatus.textContent = '';
-					setCompletionMessage('Check-in removed');
-					renderUI();
-				} catch (error) {
-					accountStatus.textContent = `Could not remove check-in: ${error.message}`;
+					accountStatus.textContent = `Could not undo: ${error.message}`;
 					saving = false;
 					renderUI();
 				}
