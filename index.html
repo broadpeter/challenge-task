@@ -367,12 +367,10 @@
 				<div class="task-display" id="task-display" hidden>
 					<p class="task-text" id="task-text"></p>
 					<div class="task-status" id="task-status"></div>
-					<div class="check-in-list" id="check-in-list"></div>
 					<div class="button-group">
 						<button id="complete-button" type="button">Mark complete</button>
-						<button class="secondary-button" id="check-in-button" type="button">Check in</button>
+						<button class="secondary-button" id="undo-complete-button" type="button" hidden>Undo</button>
 					</div>
-					<button class="small-button" id="undo-check-in-button" type="button" hidden>Undo last check-in</button>
 				</div>
 
 				<div id="task-input-display">
@@ -433,6 +431,7 @@
 			const checkInList = document.getElementById('check-in-list');
 			const completeButton = document.getElementById('complete-button');
 			const checkInButton = document.getElementById('check-in-button');
+			const undoCompleteButton = document.getElementById('undo-complete-button');
 			const undoCheckInButton = document.getElementById('undo-check-in-button');
 			const resetCountdown = document.getElementById('reset-countdown');
 			const historyList = document.getElementById('history-list');
@@ -569,6 +568,7 @@
 					completeButton.disabled = true;
 					completeButton.textContent = 'Already completed';
 					checkInButton.hidden = true;
+					undoCompleteButton.hidden = false;
 				} else {
 					icon.textContent = '◯';
 					statusText.textContent = 'In progress';
