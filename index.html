@@ -431,6 +431,7 @@
 			const completeButton = document.getElementById('complete-button');
 			const undoCompleteButton = document.getElementById('undo-complete-button');
 			const resetCountdown = document.getElementById('reset-countdown');
+			const heroSection = document.getElementById('hero-section');
 			const historyList = document.getElementById('history-list');
 			const historyEmpty = document.getElementById('history-empty');
 			const charCount = document.getElementById('char-count');
@@ -497,11 +498,13 @@
 				if (!currentWeekTask) {
 					taskDisplay.hidden = true;
 					taskInputDisplay.hidden = false;
+					heroSection.hidden = false;
 					return;
 				}
 
 				taskInputDisplay.hidden = true;
 				taskDisplay.hidden = false;
+				heroSection.hidden = true;
 				taskText.textContent = currentWeekTask.task_description;
 
 				// Update status
