@@ -492,12 +492,67 @@
 				} else {
 					const days = Math.floor(diff / (1000 * 60 * 60 * 24));
 					const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-					resetCountdown.textContent = days > 0 ? `${days}d ${hours}h left` : `${hours}h left`;
+					
+					if (days >= 2) {
+						resetCountdown.textContent = `${days} day${days === 1 ? '' : 's'}`;
+					} else {
+						resetCountdown.textContent = `${hours}h left`;
+					}
 				}
+				
+				// Update status display with countdown
+				updateTaskStatus();
 			}
 
 			function renderCheckIns() {
 				// Check-ins removed - feature simplified
+			}
+
+			function updateTaskStatus() {
+				if (!currentWeekTask) return;
+				
+				taskStatus.replaceChildren();
+				
+				if (currentWeekTask.completed_at) {
+					const icon = document.createElement('div');
+					icon.className = 'status-icon';
+					icon.textContent = '✓';
+					
+					const statusText = document.createElement('div');
+					statusText.className = 'status-text completed';
+					statusText.textContent = 'Completed on ' + new Date(currentWeekTask.completed_at).toLocaleDateString();
+					
+					taskStatus.append(icon, statusText);
+					completeButton.disabled = true;
+					completeButton.textContent = 'Completed';
+					undoCompleteButton.hidden = false;
+				} else {
+					const nextSunday = new Date(getSundayOfWeek());
+					nextSunday.setDate(nextSunday.getDate() + 7);
+					const now = new Date();
+					const diff = nextSunday - now;
+					
+					const statusText = document.createElement('div');
+					statusText.className = 'status-text';
+					
+					if (diff <= 0) {
+						statusText.textContent = 'Resets now';
+					} else {
+						const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+						const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+						
+						if (days >= 2) {
+							statusText.textContent = `${days} day${days === 1 ? '' : 's'}`;
+						} else {
+							statusText.textContent = `${hours}h left`;
+						}
+					}
+					
+					taskStatus.append(statusText);
+					completeButton.disabled = false;
+					completeButton.textContent = 'Mark complete';
+					undoCompleteButton.hidden = true;
+				}
 			}
 
 			function renderTask() {
@@ -512,30 +567,8 @@
 				taskDisplay.hidden = false;
 				heroSection.hidden = true;
 				taskText.textContent = currentWeekTask.task_description;
-
-				// Update status
-				taskStatus.replaceChildren();
-				const icon = document.createElement('div');
-				icon.className = 'status-icon';
-				const statusText = document.createElement('div');
-				statusText.className = 'status-text';
-
-				if (currentWeekTask.completed_at) {
-					icon.textContent = '✓';
-					statusText.textContent = 'Completed on ' + new Date(currentWeekTask.completed_at).toLocaleDateString();
-					statusText.classList.add('completed');
-					completeButton.disabled = true;
-					completeButton.textContent = 'Completed';
-					undoCompleteButton.hidden = false;
-				} else {
-					icon.textContent = '◯';
-					statusText.textContent = 'In progress';
-					completeButton.disabled = false;
-					completeButton.textContent = 'Mark complete';
-					undoCompleteButton.hidden = true;
-				}
-
-				taskStatus.append(icon, statusText);
+				
+				updateTaskStatus();
 			}
 
 			function renderHistory() {
@@ -768,7 +801,9 @@
 			});
 
 			// Update countdown every minute
-			countdownInterval = setInterval(updateResetCountdown, 60000);
+			countdownInterval = setInterval(() => {
+				updateResetCountdown();
+			}, 60000);
 
 			// Clean up on page unload
 			window.addEventListener('beforeunload', () => {
