@@ -404,8 +404,7 @@
 						<div class="task-status" id="task-status"></div>
 					</div>
 					<div class="button-group">
-						<button id="complete-button" type="button">Mark complete</button>
-						<button class="secondary-button" id="undo-complete-button" type="button" hidden>Undo</button>
+						<button id="action-button" type="button">Mark complete</button>
 					</div>
 				</div>
 
@@ -466,7 +465,7 @@
 			const taskStatus = document.getElementById('task-status');
 			const weekIndicator = document.getElementById('week-indicator');
 			const completeButton = document.getElementById('complete-button');
-			const undoCompleteButton = document.getElementById('undo-complete-button');
+			const completeButton = document.getElementById('action-button');
 			const heroSection = document.getElementById('hero-section');
 			const historyList = document.getElementById('history-list');
 			const historyEmpty = document.getElementById('history-empty');
@@ -574,9 +573,9 @@
 					subText.textContent = 'Done until Sunday';
 					
 					taskStatus.append(mainText, subText);
-					completeButton.disabled = true;
-					completeButton.textContent = 'Completed';
-					undoCompleteButton.hidden = false;
+					completeButton.disabled = false;
+					completeButton.textContent = 'Undo';
+					completeButton.classList.add('secondary-button');
 				} else {
 					// Show normal display
 					taskText.hidden = false;
@@ -585,10 +584,11 @@
 					
 					completeButton.disabled = false;
 					completeButton.textContent = 'Mark complete';
-					undoCompleteButton.hidden = true;
+					completeButton.classList.remove('secondary-button');
 					
 					renderWeekIndicator();
 				}
+			}
 			}
 
 			function renderTask() {
@@ -785,52 +785,42 @@
 			});
 
 			// Mark complete
+			// Mark complete or undo
 			completeButton.addEventListener('click', async () => {
 				if (!user || loading || saving || !currentWeekTask) return;
 
 				saving = true;
 				renderUI();
-				accountStatus.textContent = 'Marking complete...';
 
 				try {
-					const { error } = await db.from('weekly_tasks')
-						.update({ completed_at: new Date().toISOString() })
-						.eq('id', currentWeekTask.id)
-						.eq('user_id', user.id);
+					if (currentWeekTask.completed_at) {
+						// Undo completion
+						accountStatus.textContent = 'Undoing completion...';
+						const { error } = await db.from('weekly_tasks')
+							.update({ completed_at: null })
+							.eq('id', currentWeekTask.id)
+							.eq('user_id', user.id);
 
-					if (error) throw error;
-					currentWeekTask.completed_at = new Date().toISOString();
-					accountStatus.textContent = '';
-					setCompletionMessage('Challenge completed! Great work!');
+						if (error) throw error;
+						currentWeekTask.completed_at = null;
+						accountStatus.textContent = '';
+						setCompletionMessage('Completion undone');
+					} else {
+						// Mark complete
+						accountStatus.textContent = 'Marking complete...';
+						const { error } = await db.from('weekly_tasks')
+							.update({ completed_at: new Date().toISOString() })
+							.eq('id', currentWeekTask.id)
+							.eq('user_id', user.id);
+
+						if (error) throw error;
+						currentWeekTask.completed_at = new Date().toISOString();
+						accountStatus.textContent = '';
+						setCompletionMessage('Challenge completed! Great work!');
+					}
 					renderUI();
 				} catch (error) {
-					accountStatus.textContent = `Could not mark complete: ${error.message}`;
-					saving = false;
-					renderUI();
-				}
-			});
-
-			// Undo completion
-			undoCompleteButton.addEventListener('click', async () => {
-				if (!user || loading || saving || !currentWeekTask) return;
-
-				saving = true;
-				renderUI();
-				accountStatus.textContent = 'Undoing completion...';
-
-				try {
-					const { error } = await db.from('weekly_tasks')
-						.update({ completed_at: null })
-						.eq('id', currentWeekTask.id)
-						.eq('user_id', user.id);
-
-					if (error) throw error;
-					currentWeekTask.completed_at = null;
-					accountStatus.textContent = '';
-					setCompletionMessage('Completion undone');
-					renderUI();
-				} catch (error) {
-					accountStatus.textContent = `Could not undo: ${error.message}`;
+					accountStatus.textContent = `Could not update task: ${error.message}`;
 					saving = false;
 					renderUI();
 				}
