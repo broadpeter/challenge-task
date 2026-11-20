@@ -254,7 +254,6 @@
 				padding: 10px 12px;
 				border-radius: 6px;
 				background: #f6f6f4;
-				white-space: nowrap;
 			}
 
 			.status-icon {
@@ -270,6 +269,11 @@
 			.status-text.completed {
 				color: var(--success);
 				font-weight: 500;
+			}
+
+			.status-subtext {
+				font-size: 12px;
+				color: var(--muted);
 			}
 
 			.check-in-list {
@@ -550,41 +554,26 @@
 				taskStatus.replaceChildren();
 				
 				if (currentWeekTask.completed_at) {
-					const icon = document.createElement('div');
-					icon.className = 'status-icon';
-					icon.textContent = '✓';
+					const mainText = document.createElement('div');
+					mainText.className = 'status-text completed';
+					mainText.textContent = currentWeekTask.task_description + ' done';
 					
-					const statusText = document.createElement('div');
-					statusText.className = 'status-text completed';
-					statusText.textContent = 'Completed on ' + new Date(currentWeekTask.completed_at).toLocaleDateString();
+					const subText = document.createElement('div');
+					subText.className = 'status-subtext';
+					subText.textContent = 'Done until Sunday';
 					
-					taskStatus.append(icon, statusText);
+					const container = document.createElement('div');
+					container.style.display = 'flex';
+					container.style.flexDirection = 'column';
+					container.style.gap = '4px';
+					container.append(mainText, subText);
+					
+					taskStatus.append(container);
 					completeButton.disabled = true;
 					completeButton.textContent = 'Completed';
 					undoCompleteButton.hidden = false;
 				} else {
-					const nextSunday = new Date(getSundayOfWeek());
-					nextSunday.setDate(nextSunday.getDate() + 7);
-					const now = new Date();
-					const diff = nextSunday - now;
-					
-					const statusText = document.createElement('div');
-					statusText.className = 'status-text';
-					
-					if (diff <= 0) {
-						statusText.textContent = 'Resets now';
-					} else {
-						const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-						const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-						
-						if (days >= 2) {
-							statusText.textContent = `${days} day${days === 1 ? '' : 's'}`;
-						} else {
-							statusText.textContent = `${hours}h left`;
-						}
-					}
-					
-					taskStatus.append(statusText);
+					taskStatus.style.display = 'none';
 					completeButton.disabled = false;
 					completeButton.textContent = 'Mark complete';
 					undoCompleteButton.hidden = true;
