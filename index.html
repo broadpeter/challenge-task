@@ -205,6 +205,12 @@
 				margin-bottom: 16px;
 			}
 
+			.task-subtitle {
+				margin: 0 0 16px;
+				color: var(--muted);
+				font-size: 14px;
+			}
+
 			.task-text {
 				margin: 0 0 12px;
 				font-size: 18px;
@@ -359,12 +365,12 @@
 			</section>
 
 			<section class="task-section">
-				<div class="task-header">
-					<h2>This week's challenge</h2>
-					<div class="reset-countdown" id="reset-countdown"></div>
-				</div>
-
 				<div class="task-display" id="task-display" hidden>
+					<div class="task-header">
+						<h2>This week's challenge</h2>
+						<div class="reset-countdown" id="reset-countdown"></div>
+					</div>
+					<p class="task-subtitle">Complete before Sunday</p>
 					<p class="task-text" id="task-text"></p>
 					<div class="task-status" id="task-status"></div>
 					<div class="button-group">
