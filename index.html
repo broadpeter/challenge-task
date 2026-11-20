@@ -209,7 +209,32 @@
 				justify-content: space-between;
 				align-items: center;
 				margin-bottom: 16px;
-				gap: 8px;
+				gap: 12px;
+			}
+
+			.week-indicator {
+				display: flex;
+				gap: 4px;
+				align-items: center;
+				flex: 1;
+			}
+
+			.week-day {
+				width: 20px;
+				height: 20px;
+				border-radius: 50%;
+				background: #e8e8e5;
+				border: 1px solid transparent;
+				flex-shrink: 0;
+			}
+
+			.week-day.today {
+				border: 2px solid #1c1c1a;
+				background: transparent;
+			}
+
+			.week-day.past {
+				background: #d8d8d5;
 			}
 
 			.task-text {
@@ -228,6 +253,7 @@
 				padding: 10px 12px;
 				border-radius: 6px;
 				background: #f6f6f4;
+				white-space: nowrap;
 			}
 
 			.status-icon {
@@ -369,7 +395,7 @@
 				<div class="task-display" id="task-display" hidden>
 					<p class="task-text" id="task-text"></p>
 					<div class="task-info-row">
-						<p class="task-subtitle">Complete before Sunday</p>
+						<div class="week-indicator" id="week-indicator"></div>
 						<div class="task-status" id="task-status"></div>
 					</div>
 					<div class="button-group">
@@ -433,6 +459,7 @@
 			const taskInputDisplay = document.getElementById('task-input-display');
 			const taskText = document.getElementById('task-text');
 			const taskStatus = document.getElementById('task-status');
+			const weekIndicator = document.getElementById('week-indicator');
 			const completeButton = document.getElementById('complete-button');
 			const undoCompleteButton = document.getElementById('undo-complete-button');
 			const heroSection = document.getElementById('hero-section');
@@ -482,6 +509,35 @@
 				updateTaskStatus();
 			}
 
+			function renderWeekIndicator() {
+				weekIndicator.replaceChildren();
+				
+				const today = new Date();
+				today.setHours(0, 0, 0, 0);
+				
+				const weekStart = new Date(getSundayOfWeek());
+				weekStart.setHours(0, 0, 0, 0);
+				
+				const weekEnd = new Date(weekStart);
+				weekEnd.setDate(weekEnd.getDate() + 7);
+				
+				for (let i = 0; i < 7; i++) {
+					const dayDate = new Date(weekStart);
+					dayDate.setDate(dayDate.getDate() + i);
+					
+					const circle = document.createElement('div');
+					circle.className = 'week-day';
+					
+					if (dayDate.getTime() === today.getTime()) {
+						circle.classList.add('today');
+					} else if (dayDate < today) {
+						circle.classList.add('past');
+					}
+					
+					weekIndicator.append(circle);
+				}
+			}
+
 			function renderCheckIns() {
 				// Check-ins removed - feature simplified
 			}
@@ -489,6 +545,7 @@
 			function updateTaskStatus() {
 				if (!currentWeekTask) return;
 				
+				renderWeekIndicator();
 				taskStatus.replaceChildren();
 				
 				if (currentWeekTask.completed_at) {
