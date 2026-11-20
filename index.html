@@ -550,50 +550,44 @@
 			function updateTaskStatus() {
 				if (!currentWeekTask) return;
 				
-				const taskInfoRow = document.querySelector('.task-info-row');
-				
 				if (currentWeekTask.completed_at) {
+					// Hide normal display
 					taskText.hidden = true;
-					weekIndicator.hidden = true;
-					taskInfoRow.style.marginBottom = '0';
-					taskStatus.style.width = '100%';
-					taskStatus.style.padding = '20px 18px';
+					weekIndicator.style.display = 'none';
 					
+					// Show completion message
+					taskStatus.style.display = 'flex';
+					taskStatus.style.flexDirection = 'column';
+					taskStatus.style.alignItems = 'flex-start';
+					taskStatus.style.padding = '16px 12px';
+					taskStatus.style.background = '#e8f9f3';
 					taskStatus.replaceChildren();
+					
 					const mainText = document.createElement('div');
 					mainText.className = 'status-text completed';
 					mainText.style.fontSize = '18px';
-					mainText.style.fontWeight = '600';
+					mainText.style.marginBottom = '8px';
 					mainText.textContent = currentWeekTask.task_description + ' done';
 					
 					const subText = document.createElement('div');
 					subText.className = 'status-subtext';
 					subText.textContent = 'Done until Sunday';
 					
-					const container = document.createElement('div');
-					container.style.display = 'flex';
-					container.style.flexDirection = 'column';
-					container.style.gap = '4px';
-					container.append(mainText, subText);
-					
-					taskStatus.append(container);
+					taskStatus.append(mainText, subText);
 					completeButton.disabled = true;
 					completeButton.textContent = 'Completed';
 					undoCompleteButton.hidden = false;
 				} else {
+					// Show normal display
 					taskText.hidden = false;
-					weekIndicator.hidden = false;
-					taskInfoRow.style.marginBottom = '16px';
-					taskStatus.style.width = 'auto';
-					taskStatus.style.padding = '10px 12px';
-					
-					renderWeekIndicator();
-					taskStatus.replaceChildren();
-					taskStatus.style.display = 'flex';
+					weekIndicator.style.display = 'flex';
+					taskStatus.style.display = 'none';
 					
 					completeButton.disabled = false;
 					completeButton.textContent = 'Mark complete';
 					undoCompleteButton.hidden = true;
+					
+					renderWeekIndicator();
 				}
 			}
 
