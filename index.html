@@ -464,7 +464,6 @@
 			const taskText = document.getElementById('task-text');
 			const taskStatus = document.getElementById('task-status');
 			const weekIndicator = document.getElementById('week-indicator');
-			const completeButton = document.getElementById('complete-button');
 			const completeButton = document.getElementById('action-button');
 			const heroSection = document.getElementById('hero-section');
 			const historyList = document.getElementById('history-list');
@@ -475,6 +474,7 @@
 			let user = null;
 			let currentWeekTask = null;
 			let pastTasks = [];
+			let checkIns = [];
 			let loading = true;
 			let saving = false;
 			let completionMessageTimeout = null;
@@ -638,8 +638,7 @@
 
 			function renderUI() {
 				setTaskButton.disabled = !user || loading || saving;
-				completeButton.disabled = !user || loading || saving || !currentWeekTask || currentWeekTask.completed_at;
-				undoCompleteButton.disabled = !user || loading || saving;
+				completeButton.disabled = !user || loading || saving || !currentWeekTask;
 				signOutButton.disabled = saving;
 				renderTask();
 				renderHistory();
@@ -776,6 +775,7 @@
 					charCount.textContent = '';
 					accountStatus.textContent = '';
 					setCompletionMessage('Challenge set for this week!');
+					saving = false;
 					renderUI();
 				} catch (error) {
 					accountStatus.textContent = `Could not set challenge: ${error.message}`;
