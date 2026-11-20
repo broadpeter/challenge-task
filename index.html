@@ -550,12 +550,20 @@
 			function updateTaskStatus() {
 				if (!currentWeekTask) return;
 				
-				renderWeekIndicator();
-				taskStatus.replaceChildren();
+				const taskInfoRow = document.querySelector('.task-info-row');
 				
 				if (currentWeekTask.completed_at) {
+					taskText.hidden = true;
+					weekIndicator.hidden = true;
+					taskInfoRow.style.marginBottom = '0';
+					taskStatus.style.width = '100%';
+					taskStatus.style.padding = '20px 18px';
+					
+					taskStatus.replaceChildren();
 					const mainText = document.createElement('div');
 					mainText.className = 'status-text completed';
+					mainText.style.fontSize = '18px';
+					mainText.style.fontWeight = '600';
 					mainText.textContent = currentWeekTask.task_description + ' done';
 					
 					const subText = document.createElement('div');
@@ -573,7 +581,16 @@
 					completeButton.textContent = 'Completed';
 					undoCompleteButton.hidden = false;
 				} else {
-					taskStatus.style.display = 'none';
+					taskText.hidden = false;
+					weekIndicator.hidden = false;
+					taskInfoRow.style.marginBottom = '16px';
+					taskStatus.style.width = 'auto';
+					taskStatus.style.padding = '10px 12px';
+					
+					renderWeekIndicator();
+					taskStatus.replaceChildren();
+					taskStatus.style.display = 'flex';
+					
 					completeButton.disabled = false;
 					completeButton.textContent = 'Mark complete';
 					undoCompleteButton.hidden = true;
