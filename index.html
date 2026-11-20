@@ -71,6 +71,13 @@
 				background: #e8e8e5;
 			}
 
+			#complete-button {
+				background: var(--accent);
+				color: #fff;
+			}
+
+			#complete-button:hover { background: #5fa5ba; }
+
 			.secondary-button {
 				margin-top: 12px;
 				background: transparent;
@@ -195,6 +202,14 @@
 				margin: 0 0 16px;
 				color: var(--muted);
 				font-size: 14px;
+			}
+
+			.task-info-row {
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+				margin-bottom: 16px;
+				gap: 8px;
 			}
 
 			.task-text {
@@ -352,9 +367,11 @@
 
 			<section class="task-section">
 				<div class="task-display" id="task-display" hidden>
-					<p class="task-subtitle">Complete before Sunday</p>
 					<p class="task-text" id="task-text"></p>
-					<div class="task-status" id="task-status"></div>
+					<div class="task-info-row">
+						<p class="task-subtitle">Complete before Sunday</p>
+						<div class="task-status" id="task-status"></div>
+					</div>
 					<div class="button-group">
 						<button id="complete-button" type="button">Mark complete</button>
 						<button class="secondary-button" id="undo-complete-button" type="button" hidden>Undo</button>
